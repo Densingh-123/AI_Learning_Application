@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "learn",
+    "slug": "learn",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "https://cdn-icons-png.flaticon.com/128/8644/8644489.png",
+    "scheme": "Online-Learning-Application",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "https://cdn-icons-png.flaticon.com/128/5435/5435654.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "https://cdn-icons-png.flaticon.com/128/17621/17621079.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "https://cdn-icons-png.flaticon.com/128/4957/4957013.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ]
+  }
+}
