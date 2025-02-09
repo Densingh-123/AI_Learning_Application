@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Platform } from "react-native";
 import { auth, signInWithEmailAndPassword, signInWithPopup, googleProvider } from "../firebase";
 import { useRouter } from "expo-router";
 import { showMessage } from "react-native-flash-message";
@@ -40,20 +40,36 @@ export default function Login() {
   };
 
   return (
-    <ImageBackground source={{ uri: 'https://png.pngtree.com/background/20210714/original/pngtree-blue-geometric-small-fresh-education-learning-background-picture-image_1210546.jpg' }} style={styles.background}>
+    <ImageBackground 
+      source={{ uri: 'https://png.pngtree.com/background/20210714/original/pngtree-blue-geometric-small-fresh-education-learning-background-picture-image_1210546.jpg' }} 
+      style={styles.background}
+    >
       <View style={styles.container}>
         <View style={styles.glassContainer}>
           <Text style={styles.title}>Login</Text>
-          <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" onChangeText={setEmail} />
-          <TextInput style={styles.input} placeholder="Password" secureTextEntry onChangeText={setPassword} />
+          <TextInput 
+            style={styles.input} 
+            placeholder="Email" 
+            keyboardType="email-address" 
+            onChangeText={setEmail} 
+          />
+          <TextInput 
+            style={styles.input} 
+            placeholder="Password" 
+            secureTextEntry 
+            onChangeText={setPassword} 
+          />
 
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
-            <Text style={styles.buttonText}>Login with Google</Text>
-          </TouchableOpacity>
+          {/* Show Google Login only on Web */}
+          {Platform.OS === "web" && (
+            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
+              <Text style={styles.buttonText}>Login with Google</Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity onPress={() => router.push("/auth/Register")}>
             <Text style={styles.linkText}>Don't have an account? Register</Text>

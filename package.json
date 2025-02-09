@@ -16,6 +16,10 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
+    "@firebase/auth": "^1.9.0",
+    "@firebase/firestore": "^4.7.7",
+    "@firebase/storage": "^0.13.6",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-google-signin/google-signin": "^13.1.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
@@ -43,7 +47,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5"
+    "react-native-webview": "13.12.5",
+    "expo-image-picker": "~16.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
