@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../config/firebase";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -10,6 +10,8 @@ const CourseView = () => {
   const { courseId } = useLocalSearchParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [completedChapters, setCompletedChapters] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -18,7 +20,9 @@ const CourseView = () => {
         const courseRef = doc(db, "Courses", courseId);
         const courseSnap = await getDoc(courseRef);
         if (courseSnap.exists()) {
-          setCourse(courseSnap.data());
+          const courseData = courseSnap.data();
+          setCourse(courseData);
+          setCompletedChapters(courseData.completedChapters || []);
         } else {
           console.log("No such course!");
         }
@@ -31,6 +35,24 @@ const CourseView = () => {
 
     fetchCourse();
   }, [courseId]);
+
+  const markChapterAsCompleted = async (chapterIndex) => {
+    if (!completedChapters.includes(chapterIndex)) {
+      const updatedCompletedChapters = [...completedChapters, chapterIndex];
+      const progress = (updatedCompletedChapters.length / course.chapters.length) * 100;
+
+      try {
+        const courseRef = doc(db, "Courses", courseId);
+        await updateDoc(courseRef, {
+          completedChapters: arrayUnion(chapterIndex),
+          progress: progress,
+        });
+        setCompletedChapters(updatedCompletedChapters);
+      } catch (error) {
+        console.error("Error updating chapter completion:", error);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -89,12 +111,26 @@ const CourseView = () => {
         </TouchableOpacity>
         <Text style={styles.chaptersTitle}>Chapters</Text>
         {course.chapters.map((chapter, index) => (
-          <TouchableOpacity key={index} style={styles.chapterContainer}>
+          <TouchableOpacity
+            key={index}
+            style={styles.chapterContainer}
+            onPress={() => {
+              router.push({
+                pathname: "/components/ChapterView",
+                params: { chapter: JSON.stringify(chapter) },
+              });
+              markChapterAsCompleted(index);
+            }}
+          >
             <View style={styles.chapterIconContainer}>
               <FontAwesome5 name="file-alt" size={16} color="#1A237E" />
             </View>
             <Text style={styles.chapterName}>{chapter.chapter_name}</Text>
-            <MaterialIcons name="play-circle-outline" size={24} color="#1A237E" />
+            {completedChapters.includes(index) ? (
+              <MaterialIcons name="check-circle" size={24} color="#4CAF50" />
+            ) : (
+              <MaterialIcons name="play-circle-outline" size={24} color="#1A237E" />
+            )}
           </TouchableOpacity>
         ))}
       </View>

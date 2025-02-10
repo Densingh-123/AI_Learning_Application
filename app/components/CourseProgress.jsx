@@ -7,16 +7,16 @@ import { UserDetailContext } from "../context/UserDetailContext";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 const imageAssets = {
-  "/banner1.jpg": require("../../assets/images/banner2.jpg"),
-  "/banner2.jpg": require("../../assets/images/banner3.jpg"),
-  "/banner3.jpg": require("../../assets/images/banner4.jpg"),
-  "/banner4.jpg": require("../../assets/images/banner5.jpg"),
-  "/banner5.jpg": require("../../assets/images/banner6.jpg"),
-  "/banner6.jpg": require("../../assets/images/banner7.jpg"),
-  "/banner7.jpg": require("../../assets/images/banner8.jpg"),
-  "/banner8.jpg": require("../../assets/images/banner9.jpg"),
-  "/banner9.jpg": require("../../assets/images/banner10.jpg"),
-  "/banner10.jpg": require("../../assets/images/banner1.jpg"),
+  "/banner1.jpg": require("../../assets/images/banner1.jpg"),
+  "/banner2.jpg": require("../../assets/images/banner2.jpg"),
+  "/banner3.jpg": require("../../assets/images/banner3.jpg"),
+  "/banner4.jpg": require("../../assets/images/banner4.jpg"),
+  "/banner5.jpg": require("../../assets/images/banner5.jpg"),
+  "/banner6.jpg": require("../../assets/images/banner6.jpg"),
+  "/banner7.jpg": require("../../assets/images/banner7.jpg"),
+  "/banner8.jpg": require("../../assets/images/banner8.jpg"),
+  "/banner9.jpg": require("../../assets/images/banner9.jpg"),
+  "/banner10.jpg": require("../../assets/images/banner10.jpg"),
 };
 
 const CourseProgress = () => {
@@ -37,12 +37,17 @@ const CourseProgress = () => {
       const querySnapshot = await getDocs(q);
       const courses = querySnapshot.docs.map((doc) => {
         const data = doc.data();
+        const completedChapters = data.completedChapters || [];
+        const chapterCount = data.chapters ? data.chapters.length : 0;
+        const progress = chapterCount > 0 ? completedChapters.length / chapterCount : 0;
+
         return {
           id: doc.id,
           banner_image: data.banner_image || "/banner1.jpg",
           course_name: data.course_name || "Unnamed Course",
-          chapter_count: data.chapters ? data.chapters.length : 0,
-          completed_chapters: Math.floor((Math.random() * (data.chapters ? data.chapters.length : 5))),
+          chapter_count: chapterCount,
+          completed_chapters: completedChapters.length,
+          progress: progress,
         };
       });
       setCourseList(courses);
@@ -64,35 +69,32 @@ const CourseProgress = () => {
           keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => {
-            const progress = item.completed_chapters / item.chapter_count;
-            return (
-              <View style={styles.card}>
-                <Image
-                  source={imageAssets[item.banner_image] || imageAssets["/banner1.jpg"]}
-                  style={styles.bannerImage}
-                />
-                <View style={styles.cardContent}>
-                  <Text style={styles.courseName}>{item.course_name}</Text>
-                  <View style={styles.chapterContainer}>
-                    <FontAwesome5 name="book" size={14} color="#FFD700" />
-                    <Text style={styles.chapterCount}>{item.chapter_count} Chapters</Text>
-                  </View>
-                  <Progress.Bar
-                    progress={progress}
-                    width={250}
-                    height={10}
-                    color="#4CAF50"
-                    borderRadius={5}
-                    style={styles.progressBar}
-                  />
-                  <Text style={styles.progressText}>
-                    {item.completed_chapters} out of {item.chapter_count} chapters completed
-                  </Text>
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image
+                source={imageAssets[item.banner_image] || imageAssets["/banner1.jpg"]}
+                style={styles.bannerImage}
+              />
+              <View style={styles.cardContent}>
+                <Text style={styles.courseName}>{item.course_name}</Text>
+                <View style={styles.chapterContainer}>
+                  <FontAwesome5 name="book" size={14} color="#FFD700" />
+                  <Text style={styles.chapterCount}>{item.chapter_count} Chapters</Text>
                 </View>
+                <Progress.Bar
+                  progress={item.progress}
+                  width={250}
+                  height={10}
+                  color="#4CAF50"
+                  borderRadius={5}
+                  style={styles.progressBar}
+                />
+                <Text style={styles.progressText}>
+                  {item.completed_chapters} out of {item.chapter_count} chapters completed
+                </Text>
               </View>
-            );
-          }}
+            </View>
+          )}
         />
       )}
     </View>
