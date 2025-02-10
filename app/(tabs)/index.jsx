@@ -20,7 +20,7 @@ onAuthStateChanged(auth,async(user)=>{
   }
 })
   return (
-    <View style={styles.container}>
+    <aView style={styles.container}>
       {/* Responsive Image */}
       <Image 
         source={require("../../assets/images/learns.webp")} 
@@ -48,7 +48,7 @@ onAuthStateChanged(auth,async(user)=>{
           </TouchableOpacity>
         </BlurView>
       </View>
-    </View>
+    </aView>
   );
 }
 
