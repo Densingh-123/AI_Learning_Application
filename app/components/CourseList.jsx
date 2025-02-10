@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, Text, FlatList, Image, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, FlatList, Image, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { UserDetailContext } from "../context/UserDetailContext";
-import { FontAwesome5 } from "@expo/vector-icons"; // Importing icon library
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useRouter } from 'expo-router';
 
 const CourseList = () => {
   const { userDetail } = useContext(UserDetailContext);
   const [courseList, setCourseList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     if (userDetail) {
@@ -60,10 +62,16 @@ const CourseList = () => {
         <FlatList
           data={courseList}
           keyExtractor={(item) => item.id}
-          horizontal={true} // Enables horizontal scrolling
-          showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => router.push({
+                pathname: '/components/CourseView',
+                params: { courseId: item.id }
+              })}
+            >
               <Image
                 source={imageAssets[item.banner_image] || require("../../assets/images/banner1.jpg")}
                 style={styles.bannerImage}
@@ -75,7 +83,7 @@ const CourseList = () => {
                   <Text style={styles.chapterCount}>{item.chapter_count} Chapters</Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       ) : (
@@ -88,31 +96,34 @@ const CourseList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 5,
     backgroundColor: "#f5f5f5",
+    width: '100%',
+    marginBottom: 60,
+    marginTop: 40,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
-    textAlign: "center",
-    color: "#1A237E",
+    paddingLeft: 10,
+    fontStyle: 'italic'
   },
   card: {
     height: 230,
     backgroundColor: "#fff",
     borderRadius: 8,
-    marginRight: 16, // Adds spacing between items in horizontal scroll
-    width: 300, // Adjust width for horizontal layout
+    marginRight: 16,
+    width: 300,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
-    elevation: 3,
+    padding: 20,
   },
   bannerImage: {
     width: "100%",
-    height: 120, // Adjusted height for better horizontal display
+    height: 120,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
@@ -130,7 +141,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   chapterIcon: {
-    marginRight: 6, // Spacing between icon and text
+    marginRight: 6,
   },
   chapterCount: {
     fontSize: 14,

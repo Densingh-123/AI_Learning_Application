@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { UserDetailContext } from "../context/UserDetailContext";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -7,7 +7,9 @@ import NoCourse from "./NoCourse";
 import CourseList from "./CourseList";
 import { collection, getDocs, query, where } from "@firebase/firestore";
 import { db } from "../config/firebase";
-import PraticeSession from './PraticeSession'
+import PraticeSession from './PraticeSession';
+import CourseProgress from './CourseProgress';
+
 export default function Home() {
   const { userDetail, logoutUser } = useContext(UserDetailContext);
   const router = useRouter();
@@ -70,19 +72,21 @@ export default function Home() {
         </View>
       )}
 
-      {/* Loading Effect */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
-      ) : courseList.length == 0 ? (
-        <NoCourse />
-      
-      ) : (
-       <View>
-        <PraticeSession/>
-         <CourseList courseList={courseList} />
-
-       </View>
-      )}
+      {/* Scrollable Content */}
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        {/* Loading Effect */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+        ) : courseList.length === 0 ? (
+          <NoCourse />
+        ) : (
+          <>
+            <CourseProgress courseList={courseList} />
+            <PraticeSession />
+            <CourseList courseList={courseList} />
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -91,7 +95,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    alignItems: "center",
+    width:'100%'
   },
   header: {
     width: "100%",
@@ -156,4 +160,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 40,
+  },
 });
+
