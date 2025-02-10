@@ -1,75 +1,111 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Platform } from "react-native";
-import { auth, signInWithEmailAndPassword, signInWithPopup, googleProvider } from "../firebase";
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  ActivityIndicator,
+} from "react-native";
+import { auth, db } from "../config/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
-import { showMessage } from "react-native-flash-message";
+import { UserDetailContext } from "../context/UserDetailContext";
+import Toast from 'react-native-toast-message';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { saveUser } = useContext(UserDetailContext);
   const router = useRouter();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Toast.show({
+        type: 'error',
+        text1: 'Fields Required',
+        text2: 'Please enter email and password.',
+      });
+      return;
+    }
+
+    setLoading(true);
+
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      showMessage({ message: "Login successful!", type: "success" });
-      router.replace("/components/Home");
-    } catch (error) {
-      showMessage({ message: "Invalid credentials", type: "danger" });
-    }
-  };
+      const user = userCredential.user;
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      // Save user data to Firestore
       const userRef = doc(db, "users", user.uid);
-      await setDoc(userRef, {
-        name: user.displayName,
-        email: user.email,
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        Toast.show({
+          type: 'error',
+          text1: 'User not found',
+          text2: 'Please register first.',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const userData = userSnap.data();
+      saveUser(userData);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Login successful!',
       });
 
-      showMessage({ message: "Google Login successful!", type: "success" });
       router.replace("/components/Home");
     } catch (error) {
-      showMessage({ message: "Google Login failed", type: "danger" });
-      console.error(error);
+      console.error("Login Error:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Login failed',
+        text2: error.message,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <ImageBackground 
-      source={{ uri: 'https://png.pngtree.com/background/20210714/original/pngtree-blue-geometric-small-fresh-education-learning-background-picture-image_1210546.jpg' }} 
+    <ImageBackground
+      source={{ uri: "https://png.pngtree.com/background/20210714/original/pngtree-blue-geometric-small-fresh-education-learning-background-picture-image_1210546.jpg" }}
       style={styles.background}
     >
       <View style={styles.container}>
         <View style={styles.glassContainer}>
           <Text style={styles.title}>Login</Text>
-          <TextInput 
-            style={styles.input} 
-            placeholder="Email" 
-            keyboardType="email-address" 
-            onChangeText={setEmail} 
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
-          <TextInput 
-            style={styles.input} 
-            placeholder="Password" 
-            secureTextEntry 
-            onChangeText={setPassword} 
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
+          <TouchableOpacity 
+            style={[styles.button, loading && styles.disabledButton]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
           </TouchableOpacity>
-
-          {/* Show Google Login only on Web */}
-          {Platform.OS === "web" && (
-            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
-              <Text style={styles.buttonText}>Login with Google</Text>
-            </TouchableOpacity>
-          )}
 
           <TouchableOpacity onPress={() => router.push("/auth/Register")}>
             <Text style={styles.linkText}>Don't have an account? Register</Text>
@@ -124,13 +160,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  googleButton: {
-    backgroundColor: "#db4437",
-    padding: 15,
-    borderRadius: 10,
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 10,
+  disabledButton: {
+    backgroundColor: "#6c757d",
   },
   buttonText: {
     color: "#fff",

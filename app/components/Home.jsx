@@ -1,40 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { auth, db, getDoc, doc, signOut } from "../firebase";
 import { useRouter } from "expo-router";
-
+import { UserDetailContext } from "../context/UserDetailContext";
+import { MaterialIcons } from "@expo/vector-icons";
+import NoCourse from './NoCourse'
 export default function Home() {
-  const [userName, setUserName] = useState("");
+  const { userDetail, logoutUser } = useContext(UserDetailContext);
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (auth.currentUser) {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          setUserName(userSnap.data().name); // Fetch the user's name from Firestore
-        } else {
-          console.log("No such user in Firestore!");
-        }
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await logoutUser();
     router.replace("/auth/Login");
+  };
+
+  const getInitial = (name) => {
+    return name ? name.charAt(0).toUpperCase() : "U";
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome, {userName}!</Text>
-      <TouchableOpacity style={styles.button} onPress={handleLogout}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+      {/* Top Section */}
+      <View style={styles.header}>
+        {/* User Profile Circle */}
+        <View style={styles.profileCircle}>
+          <Text style={styles.profileText}>{getInitial(userDetail?.name)}</Text>
+        </View>
+        
+        {/* Welcome Text */}
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>Hello, {userDetail?.name}!</Text>
+          <Text style={styles.subtitle}>Let’s Get Started</Text>
+        </View>
+        
+        {/* Settings Icon */}
+        <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
+          <MaterialIcons name="settings" size={28} color="white" style={{ marginRight: 20 }} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Dropdown Menu */}
+      {dropdownVisible && (
+        <View style={styles.dropdownMenu}>
+          <TouchableOpacity style={styles.dropdownItem} onPress={handleLogout}>
+            <Text style={styles.dropdownText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <NoCourse/>
     </View>
   );
 }
@@ -42,25 +55,70 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#f5f5f5",
+    alignItems: "center",
+  },
+  header: {
+    width: "100%",
+    height: 150,
+    backgroundColor: "#1A237E",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    position: "relative",
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
+  },
+  profileCircle: {
+    marginLeft: 20,
+    width: 70,
+    height: 70,
+    borderRadius: 45,
+    backgroundColor: "#ffffff33",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+  profileText: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "white",
+  },
+  textContainer: {
+    alignItems: "center",
+    flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 20,
+    color: "white",
+    textAlign: "center",
   },
-  button: {
-    backgroundColor: "#ff4444",
-    padding: 15,
+  subtitle: {
+    fontSize: 16,
+    color: "white",
+  marginLeft:-40
+  },
+  dropdownMenu: {
+    position: "absolute",
+    top: 100,
+    right: 20,
+    backgroundColor: "white",
     borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
+    shadowColor: "black",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    width: 120,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
+  dropdownItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  dropdownText: {
+    fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
   },
 });

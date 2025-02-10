@@ -1,41 +1,75 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
-import { auth, db, createUserWithEmailAndPassword, setDoc, doc } from "../firebase";
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  ActivityIndicator,
+} from "react-native";
+import { auth, db } from "../config/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
-import { showMessage } from "react-native-flash-message";
+import Toast from 'react-native-toast-message';
+import { UserDetailContext } from "../context/UserDetailContext";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { saveUser } = useContext(UserDetailContext);
   const router = useRouter();
 
   const handleRegister = async () => {
     if (!email || !password || !name) {
-      showMessage({ message: "All fields are required", type: "danger" });
+      Toast.show({
+        type: 'error',
+        text1: 'All fields are required',
+      });
       return;
     }
 
+    setLoading(true);
+
     try {
-      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Store user data in Firestore under the "users" collection
-      await setDoc(doc(db, "users", user.uid), {
-        name: name,
-        email: email,
+      const userData = {
+        name,
+        email: user.email,
+        uid: user.uid,
+        member: false,
+      };
+
+      await setDoc(doc(db, "users", user.uid), userData);
+      saveUser(userData);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Registration successful!',
       });
 
-      showMessage({ message: "Registration successful!", type: "success" });
-      router.replace("/Home");
+      router.replace("/components/Home");
     } catch (error) {
-      showMessage({ message: error.message, type: "danger" });
+      Toast.show({
+        type: 'error',
+        text1: 'Registration failed',
+        text2: error.message,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <ImageBackground source={{ uri: 'https://png.pngtree.com/background/20210714/original/pngtree-blue-geometric-small-fresh-education-learning-background-picture-image_1210546.jpg' }} style={styles.background}>
+    <ImageBackground
+      source={{ uri: "https://png.pngtree.com/background/20210714/original/pngtree-blue-geometric-small-fresh-education-learning-background-picture-image_1210546.jpg" }}
+      style={styles.background}
+    >
       <View style={styles.container}>
         <View style={styles.glassContainer}>
           <Text style={styles.title}>Register</Text>
@@ -43,8 +77,12 @@ export default function Register() {
           <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" onChangeText={setEmail} />
           <TextInput style={styles.input} placeholder="Password" secureTextEntry onChangeText={setPassword} />
 
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.buttonText}>Register</Text>
+          <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Register</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push("/auth/Login")}>
@@ -59,8 +97,8 @@ export default function Register() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
+    resizeMode: "cover",
+    justifyContent: "center",
   },
   container: {
     flex: 1,
@@ -68,20 +106,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   glassContainer: {
-    width: '80%',
+    width: "80%",
     padding: 20,
     borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(10px)',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(10px)",
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
   },
   input: {
     width: "100%",
@@ -99,6 +137,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     marginBottom: 10,
+    opacity: 1,
   },
   buttonText: {
     color: "#fff",
@@ -108,6 +147,6 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#007bff",
     marginTop: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
