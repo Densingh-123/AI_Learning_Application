@@ -1,13 +1,40 @@
-import React, { useContext, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { UserDetailContext } from "../context/UserDetailContext";
 import { MaterialIcons } from "@expo/vector-icons";
-import NoCourse from './NoCourse'
+import NoCourse from "./NoCourse";
+import CourseList from "./CourseList";
+import { collection, getDocs, query, where } from "@firebase/firestore";
+import { db } from "../config/firebase";
+import PraticeSession from './PraticeSession'
 export default function Home() {
   const { userDetail, logoutUser } = useContext(UserDetailContext);
   const router = useRouter();
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [courseList, setCourseList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (userDetail) {
+      GetCourseList();
+    }
+  }, [userDetail]);
+
+  const GetCourseList = async () => {
+    setCourseList([]);
+    try {
+      setLoading(true);
+      const q = query(collection(db, "Courses"), where("createdBy", "==", userDetail?.email));
+      const querySnapshot = await getDocs(q);
+      const courses = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setCourseList(courses);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logoutUser();
@@ -22,18 +49,13 @@ export default function Home() {
     <View style={styles.container}>
       {/* Top Section */}
       <View style={styles.header}>
-        {/* User Profile Circle */}
         <View style={styles.profileCircle}>
           <Text style={styles.profileText}>{getInitial(userDetail?.name)}</Text>
         </View>
-        
-        {/* Welcome Text */}
         <View style={styles.textContainer}>
           <Text style={styles.title}>Hello, {userDetail?.name}!</Text>
           <Text style={styles.subtitle}>Let’s Get Started</Text>
         </View>
-        
-        {/* Settings Icon */}
         <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
           <MaterialIcons name="settings" size={28} color="white" style={{ marginRight: 20 }} />
         </TouchableOpacity>
@@ -47,7 +69,20 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       )}
-      <NoCourse/>
+
+      {/* Loading Effect */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+      ) : courseList.length == 0 ? (
+        <NoCourse />
+      
+      ) : (
+       <View>
+        <PraticeSession/>
+         <CourseList courseList={courseList} />
+
+       </View>
+      )}
     </View>
   );
 }
@@ -97,7 +132,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: "white",
-  marginLeft:-40
+    marginLeft: -40,
   },
   dropdownMenu: {
     position: "absolute",

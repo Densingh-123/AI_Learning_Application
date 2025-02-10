@@ -19,7 +19,12 @@ const {
     responseMimeType: "application/json",
   };
   
-
+  export const GenerateCourseAiModel = model.startChat({
+    generationConfig,
+    history: [
+    
+    ],
+  });
    export const GenerateTopicsAiModel = model.startChat({
       generationConfig,
       history: [
