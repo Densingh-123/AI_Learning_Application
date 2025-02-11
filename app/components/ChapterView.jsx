@@ -9,7 +9,7 @@ import { db } from "../config/firebase";
 
 const ChapterView = () => {
   const { chapter } = useLocalSearchParams();
-  const [chapterData, setChapterData] = useState(JSON.parse(chapter));
+  const [chapterData, setChapterData] = useState(JSON.parse(chapter || '{}'));
   const [copied, setCopied] = useState(false);
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -104,7 +104,7 @@ const ChapterView = () => {
   };
 
   const handleNextQuiz = () => {
-    if (currentQuizIndex < chapterData.quiz.length - 1) {
+    if (currentQuizIndex < (chapterData.quiz?.length || 0) - 1) {
       setCurrentQuizIndex(currentQuizIndex + 1);
       setSelectedOption(null);
       setShowAnswer(false);
@@ -112,12 +112,14 @@ const ChapterView = () => {
   };
 
   const renderQuiz = () => {
-    const quiz = chapterData.quiz[currentQuizIndex];
+    const quiz = chapterData.quiz?.[currentQuizIndex];
+    if (!quiz) return null;
+
     return (
       <View style={styles.quizContainer}>
         <Text style={styles.sectionTitle}>Quiz</Text>
         <Text style={styles.quizQuestion}>{quiz.question}</Text>
-        {quiz.options.map((option, index) => (
+        {quiz.options?.map((option, index) => (
           <TouchableOpacity
             key={index}
             style={[
@@ -141,6 +143,8 @@ const ChapterView = () => {
   };
 
   const renderFlashcards = () => {
+    if (!chapterData.flashcards) return null;
+
     return (
       <View style={styles.flashcardContainer}>
         <Text style={styles.sectionTitle}>Flashcards</Text>
@@ -152,6 +156,8 @@ const ChapterView = () => {
   };
 
   const renderQuestions = () => {
+    if (!chapterData.q_and_a) return null;
+
     return (
       <View style={styles.qaContainer}>
         <Text style={styles.sectionTitle}>Questions & Answers</Text>

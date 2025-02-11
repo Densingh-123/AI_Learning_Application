@@ -42,8 +42,33 @@ const AddCourse = () => {
     const onGenerateCourse = async () => {
         if (selectedTopics.length === 0) return;
         setLoading(true);
-        const PROMPT = `As you are a coaching teacher \n - User wants to learn about ${selectedTopics.join(', ')} \n - Create two courses with course name, description, and three chapters in each course \n - Include detailed explanations, code examples, and real-life scenarios \n - Generate quizzes, flashcards (fill-in-the-blanks), and Q&A for each chapter \n - Add a banner image from '/banner1.jpg' to '/banner10.jpg' \n - Output should be JSON format only without any plain text`;
+        const PROMPT = `You are an expert coaching teacher. Generate structured JSON data for courses based on the selected topics.
 
+        - User wants to learn about: ${selectedTopics.join(', ')}.
+        - Create exactly **two courses** with:
+          - **course_name**: The name of the course.
+          - **description**: A short course summary.
+          - **createdBy**: "AI Instructor"
+          - **createdOn**: Current date in YYYY-MM-DD format.
+          - **progress**: Set default as 0.
+          - **banner_image**: Randomly assign from '/banner1.jpg' to '/banner10.jpg'.
+          - **real_life_scenario**: A detailed real-world application of the course topic.
+        
+        - Each course contains **three chapters** with:
+          - **chapter_name**: The title of the chapter.
+          - **content**: A well-structured explanation.
+          - **code_example**: A code snippet relevant to the topic in java.
+        
+        - Each chapter includes:
+          1. **quiz (6 items)**: 
+             - Each item has **question, options (array), and answer**.
+          2. **flashcards (4 items)**:
+             - Each has **text (prompt) and answer**.
+          3. **q_and_a (4 items)**:
+             - Each has **question and answer**.
+        
+        - Ensure the output is strictly in **JSON format** without any plain text.`;
+        
         try {
             const aiRes = await GenerateCourseAiModel.sendMessage(PROMPT);
             const course = JSON.parse(aiRes.response.text());
