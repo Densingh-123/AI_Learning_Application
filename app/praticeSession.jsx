@@ -9,35 +9,21 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-
-export const practiceOption = [
-  {
-    name: "Quiz",
-    image: require("../../assets/images/quiz.jpg"),
-  },
-  {
-    name: "FlashCards",
-    image: require("../../assets/images/card.png"),
-  },
-  {
-    name: "Questions",
-    image: require("../../assets/images/qa.webp"),
-  },
-];
+import praticeOption from "./components/Options"; // Importing practice options
 
 const PracticeSession = () => {
   const router = useRouter();
 
   const handleNavigation = (name) => {
-    router.push(`/pratice/${name.toLowerCase()}`);
+    router.push(`/pratice/${name}`);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Practice</Text>
       <FlatList
-        data={practiceOption}
-        keyExtractor={(item, index) => index.toString()}
+        data={praticeOption}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
@@ -64,8 +50,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
-    width: "100%",
-    marginBottom: -10,
+    paddingTop: 20,
   },
   title: {
     fontSize: 24,
