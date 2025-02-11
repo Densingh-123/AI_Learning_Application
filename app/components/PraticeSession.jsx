@@ -19,10 +19,10 @@ export const practiceOption = [
     name: "FlashCards",
     image: require("../../assets/images/card.png"),
   },
-  {
-    name: "Questions",
-    image: require("../../assets/images/qa.webp"),
-  },
+  // {
+  //   name: "Questions",
+  //   image: require("../../assets/images/qa.webp"),
+  // },
 ];
 
 const PracticeSession = () => {
@@ -77,7 +77,8 @@ const styles = StyleSheet.create({
   },
   card: {
     height: 150,
-    width: 140,
+    width: 160,
+    paddingBottom:10,
     backgroundColor: "#fff",
     borderRadius: 15,
     marginRight: 15,

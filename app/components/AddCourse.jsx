@@ -26,7 +26,7 @@ const AddCourse = () => {
     const onGenerateTopic = async () => {
         if (!userInput.trim()) return;
         setLoading(true);
-        const PROMPT = `${userInput} ::As you are a coaching teacher \n - User wants to learn about the topic \n - Generate 18 short Course titles (max 18 characters each) \n - Make sure it is related to the description \n - Output will be an array of strings in JSON format only \n - Do not add any plain text in output`;
+        const PROMPT = `${userInput} ::As you are a coaching teacher \n - User wants to learn about the topic \n - Generate 12 short Course titles (max 18 characters each) \n - Make sure it is related to the description \n - Output will be an array of strings in JSON format only \n - Do not add any plain text in output`;
         
         try {
             const aiRes = await GenerateTopicsAiModel.sendMessage(PROMPT);
@@ -45,7 +45,7 @@ const AddCourse = () => {
         const PROMPT = `You are an expert coaching teacher. Generate structured JSON data for courses based on the selected topics.
 
         - User wants to learn about: ${selectedTopics.join(', ')}.
-        - Create exactly **two courses** with:
+        - Create exactly **two courses to five courses** with:
           - **course_name**: The name of the course.
           - **description**: A short course summary.
           - **createdBy**: "AI Instructor"
@@ -54,7 +54,7 @@ const AddCourse = () => {
           - **banner_image**: Randomly assign from '/banner1.jpg' to '/banner10.jpg'.
           - **real_life_scenario**: A detailed real-world application of the course topic.
         
-        - Each course contains **three chapters** with:
+        - Each course contains **three chapters to ten chapters** with:
           - **chapter_name**: The title of the chapter.
           - **content**: A well-structured explanation.
           - **code_example**: A code snippet relevant to the topic in java.
@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f0f4f8',
         alignItems: 'center',
+        height:'100%'
     },
     header: {
         fontSize: 28,

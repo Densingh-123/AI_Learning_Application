@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const explore = () => {
+const Flash = () => {
   return (
     <View>
-      <Text>explore</Text>
+      <Text>Flash</Text>
     </View>
   )
 }
 
-export default explore
+export default Flash
 
 const styles = StyleSheet.create({})

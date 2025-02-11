@@ -17,7 +17,16 @@ const CourseList = () => {
       fetchCourses();
     }
   }, [userDetail]);
-
+const onPress=(course)=>{
+  if(Option.name=='Quiz'){
+    router.push({
+      pathname:'/quiz',
+      params:{
+        courseParams:course
+      }
+    })
+  }
+}
   const fetchCourses = async () => {
     setLoading(true);
     try {
