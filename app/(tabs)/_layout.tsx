@@ -11,7 +11,7 @@ import { createStackNavigator, TransitionPresets } from '@react-navigation/stack
 import HomeScreen from '../components/Home';
 import ExploreScreen from './explore';
 import ProgressScreen from './Progress';
-import ProfileScreen from './Progress';
+import ProfileScreen from './Profile';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();

@@ -70,10 +70,10 @@ const CourseProgress = () => {
   };
 
   return (
-    <LinearGradient colors={["#E0F7FA", "#B2EBF2"]} style={styles.container}>
+    <View  style={styles.container}>
       <Text style={styles.title}>Course Progress</Text>
       {loading ? (
-        <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+        <ActivityIndicator size="large" color="#ffff" style={{ marginTop: 20 }} />
       ) : (
         <FlatList
           data={courseList}
@@ -108,7 +108,7 @@ const CourseProgress = () => {
           )}
         />
       )}
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -117,14 +117,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 60,
     paddingHorizontal: 15,
+    backgroundColor:'#1E1E2E'
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#1A237E",
+    color: "#ffff",
     marginBottom: 20,
     textAlign: "center",
-    textShadowColor: "rgba(0, 0, 0, 0.1)",
+    textShadowColor: "rgba(255, 255, 255, 0.1)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 15,
     marginBottom: 20,
     shadowColor: "#000",

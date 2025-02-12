@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import {useRouter}from 'expo-router'
+import { useRouter } from 'expo-router';
+
 const NoCourse = () => {
-    const router = useRouter();
+  const router = useRouter(); // Hook must be inside the component
+
   return (
     <View style={styles.container}>
       <Image 
@@ -12,12 +14,12 @@ const NoCourse = () => {
       />
       <Text style={styles.message}>You don't have any courses</Text>
       
-      <TouchableOpacity style={styles.createButton} onPress={()=>router.push('/components/AddCourse')}>
+      <TouchableOpacity style={styles.createButton} onPress={() => router.push('/components/AddCourse')}>
         <FontAwesome5 name="plus-circle" size={20} color="white" />
         <Text style={styles.buttonText}>Create a New Course</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.exploreButton}>
+      <TouchableOpacity style={styles.exploreButton} onPress={() => router.back()}>
         <MaterialIcons name="explore" size={22} color="white" />
         <Text style={styles.buttonText}>Explore Existing Courses</Text>
       </TouchableOpacity>
@@ -34,6 +36,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F0F8FF',
     padding: 20,
+    borderRadius: 20,
   },
   image: {
     width: 100,
@@ -76,7 +79,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    marginRight:15,
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

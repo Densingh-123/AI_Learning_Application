@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, FlatList, StyleSheet } from 'react-native';
-import { db } from '../config/firebase'; // Import the Firestore instance
+import { db } from './config/firebase'; // Import the Firestore instance
 import { collection, getDocs } from "firebase/firestore"; // Import Firestore methods
 
 const CoursesScreen = () => {

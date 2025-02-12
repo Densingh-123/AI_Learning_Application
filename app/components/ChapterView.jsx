@@ -256,7 +256,7 @@ const Flashcard = ({ flashcard }) => {
       <Animated.View
         style={[styles.flashcard, { transform: [{ rotateY: frontInterpolate }] }]}
       >
-        <Text style={styles.flashcardText}>{flashcard.text}</Text>
+        <Text style={styles.flashcardText}>{flashcard.answer}</Text>
         <TouchableOpacity style={styles.flipButton} onPress={flipCard}>
           <Text style={styles.flipButtonText}>Flip</Text>
         </TouchableOpacity>
@@ -264,7 +264,7 @@ const Flashcard = ({ flashcard }) => {
       <Animated.View
         style={[styles.flashcard, styles.flashcardBack, { transform: [{ rotateY: backInterpolate }] }]}
       >
-        <Text style={styles.flashcardText}>{flashcard.answer}</Text>
+        <Text style={styles.flashcardText}>{flashcard.text}</Text>
         <TouchableOpacity style={styles.flipButton} onPress={flipBack}>
           <Text style={styles.flipButtonText}>Flip Back</Text>
         </TouchableOpacity>

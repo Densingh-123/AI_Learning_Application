@@ -5,11 +5,11 @@ import {
     TouchableOpacity, 
     View, 
     ScrollView, 
-    ActivityIndicator
+    ActivityIndicator,
+    ImageBackground,
 } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { GenerateCourseAiModel, GenerateTopicsAiModel } from '../config/AiModel';
-import { FontAwesome } from '@expo/vector-icons';
 import { doc, setDoc } from '@firebase/firestore';
 import { UserDetailContext } from '../context/UserDetailContext';
 import { useRouter } from 'expo-router';
@@ -26,7 +26,7 @@ const AddCourse = () => {
     const onGenerateTopic = async () => {
         if (!userInput.trim()) return;
         setLoading(true);
-        const PROMPT = `${userInput} ::As you are a coaching teacher \n - User wants to learn about the topic \n - Generate 12 short Course titles (max 18 characters each) \n - Make sure it is related to the description \n - Output will be an array of strings in JSON format only \n - Do not add any plain text in output`;
+        const PROMPT = `${userInput} ::As you are a coaching teacher \n - User wants to learn about the topic \n - Generate 10 short Course titles (max 18 characters each) \n - Make sure it is related to the description \n - Output will be an array of strings in JSON format only \n - Do not add any plain text in output`;
         
         try {
             const aiRes = await GenerateTopicsAiModel.sendMessage(PROMPT);
@@ -64,7 +64,7 @@ const AddCourse = () => {
              - Each item has **question, options (array), and answer**.
           2. **flashcards (4 items)**:
              - Each has **text (prompt) and answer**.
-          3. **q_and_a (4 items)**:
+          3. **q_and_a (7 items)**:
              - Each has **question and answer**.
         
         - Ensure the output is strictly in **JSON format** without any plain text.`;
@@ -92,65 +92,91 @@ const AddCourse = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-            <View style={styles.container}>
-                <Text style={styles.header}>Create New Course</Text>
-                <TextInput 
-                    style={styles.input}
-                    placeholder='(e.g., Learn Python, Learn Java, Learn Big Data)'
-                    onChangeText={setUserInput}
-                    value={userInput}
-                    placeholderTextColor='#aaa'
-                />
-                <TouchableOpacity style={styles.generateButton} onPress={onGenerateTopic} disabled={loading}>
-                    {loading ? <ActivityIndicator size="small" color="white" /> : <Text style={styles.buttonText}>Generate Topics</Text>}
-                </TouchableOpacity>
-                
-                {topics.length > 0 && (
-                    <View>
-                        <Text style={styles.sectionTitle}>Select Topics</Text>
-                        <View style={styles.topicContainer}>
-                            {topics.map((item, index) => (
-                                <TouchableOpacity 
-                                    key={index} 
-                                    style={[styles.topicItem, selectedTopics.includes(item) && styles.selectedTopic]}
-                                    onPress={() => toggleTopicSelection(item)}
-                                >
-                                    <Text style={styles.topicText}>{item}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    </View>
-                )}
-                
-                {selectedTopics.length > 0 && (
-                    <TouchableOpacity style={styles.generateButton} onPress={onGenerateCourse} disabled={loading}>
-                        {loading ? <ActivityIndicator size="small" color="white" /> : <Text style={styles.buttonText}>Generate Course</Text>}
+        <ImageBackground 
+            source={{ uri: 'https://w0.peakpx.com/wallpaper/268/507/HD-wallpaper-never-stop-learning-calm-positive-quotes-stay-word.jpg' }}
+            style={styles.backgroundImage}
+            resizeMode="cover"
+        >
+            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                <View style={styles.container}>
+                    <Text style={styles.header}>Create New Course</Text>
+                  
+                    <TextInput 
+                        style={styles.input}
+                        placeholder='(e.g., Learn Python, Learn Java, Learn Big Data)'
+                        onChangeText={setUserInput}
+                        value={userInput}
+                        placeholderTextColor='#aaa'
+                    />
+                    <TouchableOpacity style={styles.generateButton} onPress={onGenerateTopic} disabled={loading}>
+                        {loading ? <ActivityIndicator size="small" color="white" /> : <Text style={styles.buttonText}>Generate Topics</Text>}
                     </TouchableOpacity>
-                )}
-            </View>
-        </ScrollView>
+                    
+                    {topics.length > 0 && (
+                        <View>
+                            <Text style={styles.sectionTitle}>Select Topics</Text>
+                            <View style={styles.topicContainer}>
+                                {topics.map((item, index) => (
+                                    <TouchableOpacity 
+                                        key={index} 
+                                        style={[styles.topicItem, selectedTopics.includes(item) && styles.selectedTopic]}
+                                        onPress={() => toggleTopicSelection(item)}
+                                    >
+                                        <Text style={styles.topicText}>{item}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+                    
+                    {selectedTopics.length > 0 && (
+                        <TouchableOpacity style={styles.generateButton} onPress={onGenerateCourse} disabled={loading}>
+                            {loading ? <ActivityIndicator size="small" color="white" /> : <Text style={styles.buttonText}>Generate Course</Text>}
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </ScrollView>
+        </ImageBackground>
     );
 };
 
 export default AddCourse;
 
 const styles = StyleSheet.create({
+    backgroundImage: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        
+    },
     scrollContainer: {
         flexGrow: 1,
         paddingBottom: 30,
     },
     container: {
         padding: 20,
-        backgroundColor: '#f0f4f8',
+        backgroundColor: 'rgba(255, 255, 255, 1)', // Semi-transparent white background
+        borderRadius: 12,
+        margin: 20,
         alignItems: 'center',
-        height:'100%'
+        paddingTop:100
     },
     header: {
         fontSize: 28,
         fontWeight: 'bold',
         color: '#2c3e50',
         marginBottom: 10,
+        textAlign: 'center',
+    },
+    infoText: {
+        fontSize: 16,
+        color: '#34495e',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    highlight: {
+        fontWeight: 'bold',
+        color: '#3498db',
     },
     input: {
         width: '100%',
@@ -159,6 +185,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 8,
         backgroundColor: 'white',
+        marginBottom: 20,
     },
     generateButton: {
         backgroundColor: '#3498db',
@@ -178,6 +205,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 20,
         color: '#2c3e50',
+        textAlign: 'center',
     },
     topicContainer: {
         flexDirection: 'row',
